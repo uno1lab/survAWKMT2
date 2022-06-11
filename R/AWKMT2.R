@@ -7,7 +7,7 @@
 #' @author Miki Horiguchi, Hajime Uno
 #' @references
 #' Uno H, Tian L, Claggett B, Wei LJ. A versatile test for equality of two survival functions based on weighted differences of Kaplan-Meier curves.
-#' Statistics in Medicine 2015, 34, 3680-3695.
+#' Statistics in Medicine 2015, 34, 3680-3695. doi:10.1002/sim.6591.
 #' @seealso
 #' survival
 #' @examples
@@ -59,7 +59,7 @@ NULL
 #'  survival
 #' @references
 #'  Uno H, Tian L, Claggett B, Wei LJ. A versatile test for equality of two survival functions based on weighted differences of Kaplan-Meier curves.
-#'  Statistics in Medicine 2015, 34, 3680-3695.
+#'  Statistics in Medicine 2015, 34, 3680-3695. doi:10.1002/sim.6591.
 #' @name   AWKMT2
 #' @aliases AWKMT2
 #' @import survival
