@@ -90,11 +90,12 @@ NULL
 ###############################################################################################
 # funcKM2 (hidden)
 ###############################################################################################
-funcKM2 <- function(data, t_idx, status, x, weight=NULL){
+funcKM2 <- function(data, t_idx, weight=NULL){
   if(is.null(weight)){
     weight = rep(1, nrow(data))
   }
 
+  
   data     = data[order(data$time), ]
   data_wt  = cbind(data, weight)
 
@@ -118,21 +119,22 @@ funcKM2 <- function(data, t_idx, status, x, weight=NULL){
   #i>=2
   for(i in 2:length(t_idx)){
     Y[i] = Y[i-1] - N[i-1] - C[i-1]
-
-    if(sum(x==t_idx[i] & status==1)>0){
-      N[i] = sum(x==t_idx[i] & status==1)*data_wt[which(x==t_idx[i] & status==1)[1],4]
+    if(sum(data_wt$time==t_idx[i] & data_wt$status==1)>0){
+      N[i] = sum(data_wt[which(data_wt$time==t_idx[i] & data_wt$status==1),"weight"])
     }else{
       N[i] = 0
     }
 
-    if(sum(x==t_idx[i] & status==0)>0){
-      C[i] = sum(x==t_idx[i] & status==0)*data_wt[which(x==t_idx[i] & status==0)[1],4]
+    if(sum(data_wt$time==t_idx[i] & data_wt$status==0)>0){
+      C[i] = sum(data_wt[which(data_wt$time==t_idx[i] & data_wt$status==0),"weight"])
     }else{
       C[i] = 0
     }
+  
 
-    if(Y[i]<0) Y[i] = 0
-
+    if(Y[i]<0){
+    	 Y[i] = 0
+    }
     if(Y[i]==0){
       S[i] = S[i-1]
     }else{
@@ -145,24 +147,25 @@ funcKM2 <- function(data, t_idx, status, x, weight=NULL){
       H[i] = N[i]/(Y[i]*(Y[i]-N[i]))
     }
 
-    if(S[i]<0) S[i] = 0
-
+    if(S[i]<0){
+    	  S[i] = 0
+    }
+    
     D[i] = sum(H[2:i])
+    
     E[i] = sqrt((S[i]**2)*D[i])
 
-    if(is.na(S[i])) S[i] = 0
-    if(is.na(E[i])) E[i] = 0
+    if(is.na(S[i])){
+    	  S[i] = 0
+    }
+    if(is.na(E[i])){
+    	  E[i] = 0
+    	}
   }
 
-  result = list()
-  result$t_idx    = t_idx
-  result$n_risk   = Y
-  result$n_event  = N
-  result$n_censor = C
-  result$surv     = S
-  result$SE       = E
 
-  out           = cbind(result$t_idx, result$n_risk, result$n_event, result$n_censor, result$surv, result$SE)
+  #---
+  out           = cbind(t_idx, Y, N, C, S, E)
   colnames(out) = c("t_idx", "n_risk", "n_event", "n_censor", "surv", "SE")
   return(out)
 }
@@ -175,19 +178,19 @@ funcAWKMT2_c1<- function(indata, t_idx, tau1, tau2, crange, test, type, obs_surv
   #-- Get status1 and x1 (arm=1) --
   g1      = indata[indata$arm==1, ]
   g1      = g1[order(g1$time), ]
-  status1 = g1$status
-  x1      = g1$time
+  #status1 = g1$status
+  #x1      = g1$time
 
   #-- Get status0 and x0 (arm=0) --
   g0      = indata[indata$arm==0, ]
   g0      = g0[order(g0$time), ]
-  status0 = g0$status
-  x0      = g0$time
+  #status0 = g0$status
+  #x0      = g0$time
 
   #-- Get stats1 using funcKM2 --
   if(type=="observe" | type=="permutation"){
-    wk1 = funcKM2(data=g1, t_idx=t_idx, status=status1, x=x1, weight=NULL)
-    wk0 = funcKM2(data=g0, t_idx=t_idx, status=status0, x=x0, weight=NULL)
+    wk1 = funcKM2(data=g1, t_idx=t_idx, weight=NULL)
+    wk0 = funcKM2(data=g0, t_idx=t_idx, weight=NULL)
   }
 
   if(type=="perturbation"){
@@ -195,8 +198,8 @@ funcAWKMT2_c1<- function(indata, t_idx, tau1, tau2, crange, test, type, obs_surv
     n0  = nrow(g0)
     wt1 = rexp(n1)
     wt0 = rexp(n0)
-    wk1 = funcKM2(g1, t_idx, status1, x1, weight=wt1)
-    wk0 = funcKM2(g0, t_idx, status0, x0, weight=wt0)
+    wk1 = funcKM2(g1, t_idx, weight=wt1)
+    wk0 = funcKM2(g0, t_idx, weight=wt0)
   }
 
   wk           =  cbind(wk1, wk0[,-1])
@@ -280,6 +283,9 @@ AWKMT2 <- function(indata, tau, c_first=0, c_last=4, c_by=0.1, method="permutati
   rank2 <- function(x){
     rank(x, ties.method="min")
   }
+  
+  #--
+  names(indata) = c("time", "status", "arm")
 
   #-- Get tau1 --
   tau1 = 0

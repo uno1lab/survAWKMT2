@@ -1,0 +1,68 @@
+tmp = read.csv("~/Dropbox (Personal)/asa8/msn-adaptive-tau2/Example-checkmate-214/Reconstruct/PFS.csv")
+head(tmp)
+tau=12
+indata=tmp
+tau1 = 0#
+  #-- Get tau2 --#
+  tau2 = tau#
+  #-- Get unique_time, n_times --#
+  t_idx   = unique(sort(c(indata$time, 0, tau1, tau2, tau)))#
+  n_times = length(t_idx)
+crange   = seq(c_first, c_last, by=c_by)#
+  #-- Get observed V1(c) and V2(c) using funcAWKMT2_c1 --#
+  if(test=="1_side"){#
+    obs_ours = funcAWKMT2_c1(indata, t_idx, tau1, tau2, crange, test="1_side", type="observe")#
+  }#
+  if(test=="2_side"){#
+    obs_ours = funcAWKMT2_c1(indata, t_idx, tau1, tau2, crange, test="2_side", type="observe")#
+  }#
+  obs_survdiff    = obs_ours$obs_survdiff
+t_idx   = unique(sort(c(indata$time, 0, tau1, tau2, tau)))
+t_idx
+tau
+tau2
+t_idx   = unique(sort(c(indata$time, 0, tau1, tau2, tau)))
+t_idx
+n_times = length(t_idx)
+data=indat
+data=indata
+t_idx=t_idx
+status=indata$status
+x==indata$x
+x==indata$time
+weight=NULL
+weight = rep(1, nrow(data))
+data     = data[order(data$time), ]#
+  data_wt  = cbind(data, weight)
+Y = rep(0,length(t_idx)) #n.risk#
+  N = rep(0,length(t_idx)) #n.event#
+  C = rep(0,length(t_idx)) #n.censor#
+  S = rep(0,length(t_idx)) #surv#
+  H = rep(0,length(t_idx)) #forSE#
+  D = rep(0,length(t_idx)) #forSE#
+  E = rep(0,length(t_idx)) #SE#
+  #i=1#
+  Y[1] = sum(data_wt[ ,4])#
+  N[1] = 0#
+  C[1] = 0#
+  S[1] = 1#
+  H[1] = 0#
+  D[1] = 0#
+  E[1] = 0#
+  #i>=2
+i=2
+Y[i] = Y[i-1] - N[i-1] - C[i-1]
+sum(x==t_idx[i] & status==1)>0
+x=indata$time
+sum(x==t_idx[i] & status==1)>0
+status
+N[i] = 0
+i=3
+Y[i] = Y[i-1] - N[i-1] - C[i-1]
+sum(x==t_idx[i] & status==1)>0
+N[i] = sum(x==t_idx[i] & status==1)*data_wt[which(x==t_idx[i] & status==1),4]
+sum(x==t_idx[i] & status==1)*data_wt[which(x==t_idx[i] & status==1),4]
+sum(x==t_idx[i] & status==1)*data_wt[which(x==t_idx[i] & status==1)[1],4]
+data_wt
+head(data_wt)
+data_wt$weight
